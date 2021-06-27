@@ -61,13 +61,17 @@ class BigBlueButton
     protected $urlBuilder;
     protected $jSessionId;
 
-    public function __construct($baseUrl = null, $secretKey = null)
+    /**
+     * BigBlueButton constructor.
+     * @param null $baseUrl
+     * @param null $secret
+     */
+    public function __construct($baseUrl = null, $secret = null)
     {
-        $baseUrl = $baseUrl ?? getenv('BBB_SERVER_BASE_URL');
-        $secretKey = $secretKey ?? getenv('BBB_SECRET');
         // Keeping backward compatibility with older deployed versions
-        $this->securitySecret   = (getenv('BBB_SECURITY_SALT') === false) ? $secretKey : $this->securitySecret = getenv('BBB_SECURITY_SALT');
-        $this->bbbServerBaseUrl = $baseUrl;
+        // BBB_SECRET is the new variable name and have higher priority against the old named BBB_SECURITY_SALT
+        $this->securitySecret   = $secret ?: getenv('BBB_SECRET') ?: getenv('BBB_SECURITY_SALT');
+        $this->bbbServerBaseUrl = $baseUrl ?: getenv('BBB_SERVER_BASE_URL');
         $this->urlBuilder       = new UrlBuilder($this->securitySecret, $this->bbbServerBaseUrl);
     }
 
